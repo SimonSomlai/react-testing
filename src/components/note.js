@@ -14,6 +14,7 @@ class Note extends Component {
   }
 
   updateNote(){
+
     var fields = this.refs
     for(var prop in fields){
       this.state.note[prop] = fields[prop].value
