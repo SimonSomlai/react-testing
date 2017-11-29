@@ -17,7 +17,24 @@ import API from "../src/services/api.js"
 
 // CHEAT SHEET
 // component.node = this
+// component.instance() = this
+// component.state() = state
 // component.find('.panel-title').node.value
+
+// .to.not.be.null;
+// .to.equal()
+// .to.be.true
+
+// var toggleState = sinon.spy(Note.prototype, "toggleState"); // Spy on method toggleState BEFORE component is mounted
+// component = mount(<Note note={note}/>); // mount it
+// component.find('.edit-button').simulate('click'); // Simulate a click event on the edit button
+// expect(toggleState).to.have.property('callCount', 1); // toggleState should have been called
+// expect(component.state().isEditing).to.be.true; // isEditing should have been set to true in the state
+
+
+// mock = empty object that returns predefined behavior
+// stub = data
+
 describe('(Component) App', () => {
   it('should initialize', () => {
     const component = mount(<App/>);
@@ -65,50 +82,50 @@ describe('Note', () => {
   })
 
   it('Should trigger toggleState when edit button is clicked & change state accordingly', () => {
-    var toggleState = sinon.spy(Note.prototype, "toggleState"); // Spy on method toggleState BEFORE component is mounted
+    const toggleState = sinon.spy(Note.prototype, "toggleState"); // Spy on method toggleState BEFORE component is mounted
     component = mount(<Note note={note}/>); // mount it
     component.find('.edit-button').simulate('click'); // Simulate a click event on the edit button
     expect(toggleState).to.have.property('callCount', 1); // toggleState should have been called
-    expect(component.node.state.isEditing).to.be.true; // isEditing should have been set to true in the state
+    expect(component.state().isEditing).to.be.true; // isEditing should have been set to true in the state
   })
 
   it('Should create correctly in the state & show correctly on UI', () => {
     const component = mount(<App/>);
-    var initialUiLength = component.find('.panel-title').length;
-    var initialStateLength = component.node.state.notes.length;
+    // const initialUiLength = component.find('.panel-title').length;
+    const initialStateLength = component.state().notes.length;
 
-    var titleInput = component.find('.note-title');
-    var descriptionInput = component.find('.note-description');
+    let titleInput = component.find('.note-title');
+    let descriptionInput = component.find('.note-description');
     titleInput.node.value = "My new note title!"; // Update value
     descriptionInput.node.value = "My new note description!"; // Update value
     titleInput.simulate("change"); // Update it in the DOM
     descriptionInput.simulate("change"); // Update it in the DOM
     component.find('.create-note').first().simulate('click'); // Click on "create note"
 
-    expect(component.find('.panel-title').length).to.equal(initialUiLength + 1); // Check if UI gets updated correctly
-    expect(component.node.state.notes.length).to.equal(initialStateLength + 1); // Check if state gets updated correctly
+    // expect(component.find('.panel-title').length).to.equal(initialUiLength + 1); // Check if UI gets updated correctly
+    expect(component.state().notes.length).to.equal(initialStateLength + 1); // Check if state gets updated correctly
   })
 
   it('Should update correctly in the state & show correctly on UI', () => {
     const component = mount(<App/>);
     component.find('.edit-button').first().simulate('click'); // Simulate a click event
-    var title = component.find('.panel-title input')
+    let title = component.find('.panel-title input')
     title.node.value = "Changing the note!" // Simulate edit
     title.simulate("change") // Update it in the DOM
     component.find('.save-button').first().simulate('click'); // Simulate a click event on the save button
 
     expect(component.find('.panel-title').first().text()).to.equal("Changing the note!") // Check if text is set right on UI
-    expect(component.node.state.notes[0].title).to.equal("Changing the note!") // Check if text is set right in state
+    expect(component.state().notes[0].title).to.equal("Changing the note!") // Check if text is set right in state
     expect(component.find('.save-button').length).to.equal(0) // Save buttons should be gone
   })
 
   it('Should delete correctly in the state & show correctly on UI', () => {
     const component = mount(<App/>);
-    var initialUiLength = component.find('.panel-title').length;
-    var initialStateLength = component.node.state.notes.length;
+    const initialUiLength = component.find('.panel-title').length;
+    const initialStateLength = component.state().notes.length;
     component.find('.delete-button').first().simulate('click'); // Simulate a click event
     expect(component.find('.panel-title').length).to.equal(initialUiLength - 1); // Check if UI gets updated correctly
-    expect(component.node.state.notes.length).to.equal(initialStateLength - 1); // Check if state gets updated correctly
+    expect(component.state().notes.length).to.equal(initialStateLength - 1); // Check if state gets updated correctly
   })
 
   // "Unit" Tests
@@ -122,22 +139,22 @@ describe('Note', () => {
 
   it('function findNote(id) should find the right note when given an id', () => {
     const component = mount(<App/>);
-    component.node.setState({notes: notes});
+    component.setState({notes: notes});
     expect(component.node.findNote(1)).to.equal(notes[0]);
   })
 
   it('function findIndex(note) should retrieve the right index in the state', () => {
     const component = mount(<App/>);
-    component.node.setState({notes: notes});
-    expect(component.node.findIndex(notes[2])).to.equal(2);
+    component.setState({notes: notes});
+    expect(component.node.findIndex(component.state().notes[2])).to.equal(2);
   })
 
   it('function updateNote(newNote) should update the note correctly', () => {
     const component = mount(<App/>);
-    component.node.setState({notes: notes});
-    component.node.updateNote(note);
-    var index = component.node.findIndex(note);
-    expect(component.node.state.notes[index]).to.equal(note);
+    component.setState({notes: notes});
+    component.node.updateNote(note); // Pass in a new note with id of 2 with updated title & description
+    var index = component.node.findIndex(note); // Get the index in the state
+    expect(component.state().notes[index]).to.equal(note); // Make sure the element at index is the new note
   })
 });
 
